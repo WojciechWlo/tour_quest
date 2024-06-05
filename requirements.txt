@@ -1,0 +1,6 @@
+flask
+flask_session
+psycopg2-binary
+requests
+flask_sqlalchemy
+flask_bcrypt

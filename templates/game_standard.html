@@ -1,0 +1,13 @@
+{% extends "game.html" %}
+
+{% block game_container %}
+    <h3>{{stage.header}}</h3>
+    <br>
+    <div id = "game_details_container">
+        <h4>{{stage.label}}</h4>
+        {{stage.description}}
+    </div>
+    <br>
+    <br>
+    {% include "game_form.html" %}
+{% endblock %}

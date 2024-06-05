@@ -1,0 +1,19 @@
+FROM python:3.9-buster
+USER root
+
+WORKDIR /usr/src/app
+
+RUN apt update
+
+RUN pip install -U pip
+
+COPY ./requirements.txt ./
+#COPY ./app.py ./
+
+RUN python -m pip install -r requirements.txt
+
+# Expose the port Flask runs on
+EXPOSE 5000
+
+ENTRYPOINT ["python3"]
+CMD ["app.py"]

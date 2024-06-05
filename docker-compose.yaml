@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  flask_app:
+    build:
+      context: .
+      dockerfile: dockerfile.dev
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      - ./:/usr/src/app/
+    depends_on:
+      - db
+
+
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB_FILE: /run/secrets/pg_db
+      POSTGRES_USER_FILE: /run/secrets/pg_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+    secrets:
+      - pg_db
+      - pg_user
+      - pg_password
+      - source: initdb
+        target: /docker-entrypoint-initdb.d/initdb.sql
+
+
+secrets:
+  pg_db: 
+    file: secrets/pg_db 
+  pg_user: 
+    file: secrets/pg_user
+  pg_password: 
+    file: secrets/pg_password    
+  initdb: 
+    file: secrets/initdb.sql
+
+
+volumes:
+  postgres_data:

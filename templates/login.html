@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="col-xl-3 col-md-7 col-sm-12">
+        <div id="container">
+            <h1>Login</h1>
+            <form action="/login" method="post">
+                Login<br/>
+                <input autocomplete="off" autofocus name = "login" placeholder="Login" type = "text"><br/>
+                Password<br/>
+                <input autocomplete="off" name = "password" placeholder="Password" type = "password"><br/>
+                <br/>
+                <button type = "submit">Sign in</button>
+                {%if msg is not none %}
+                    <br>
+                    <div class="form_message">
+                        {{msg}}
+                    </div>
+                {% endif%}
+            </form>
+
+            <br/>
+            Do You have no account? <a href = "/register">Sign up</a>
+        </div>
+    </div>
+{% endblock %}

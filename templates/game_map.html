@@ -1,0 +1,59 @@
+{% extends "game.html" %}
+
+{% block game_container %}
+    <h3>{{stage.header}}</h3>
+    <br>
+    <div id = "game_details_container">
+        <h4>{{stage.label}}</h4>
+        {{stage.description}}
+
+    </div>
+    <br>
+    <input type="button" onclick="displayMap('{{stage.destination}}')" class="button" value ="Map"/>
+    
+    <br>
+    <br>
+    <script>
+        function displayMap(src)
+        {
+
+            var iframe = document.createElement("iframe");
+            iframe.src = src;
+            iframe.allowfullscreen="";
+            iframe.loading="lazy";
+            iframe.referrerpolicy="no-referrer-when-downgrade";
+            iframe.style.width = "75%";
+            iframe.style.height = "75%";
+            iframe.style.left ="50%";
+            iframe.style.top ="50%";
+            iframe.style.transform = "translate(-50%,-50%)";
+            iframe.style.position = "fixed";
+
+            var black_cover = document.createElement("div");
+            black_cover.className = "black_cover";
+            /*
+            black_cover.style.position = "absolute";
+            black_cover.style.top = "0px";
+            black_cover.style.left = "0px";
+            black_cover.style.width = "100%";
+            black_cover.style.height = "100%";
+            black_cover.style.padding = "100px";         
+            black_cover.style.backgroundColor = "rgba(0,0,0,0.5)";
+            */
+            black_cover.onclick = function() {
+                if(black_cover)
+                {
+                    black_cover.remove();
+                    black_cover = null;
+                }
+            };
+
+            black_cover.appendChild(iframe);
+            
+            document.body.appendChild(black_cover);
+        };
+    </script>
+
+    {% include "game_form.html" %}
+{% endblock %}
+

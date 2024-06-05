@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="col-xl-3 col-md-5 col-sm-7">
+    <div id="container">
+        <h1>Welcome {{login}}</h1>
+        <a href = "/logout">Log out</a>
+
+        <h3>Games</h3>
+        {% if games is not none%}
+            
+            <div id = "games_list">
+                {%for game in games.games %}
+                <div class ="games_list_element">
+                    <div class="game_image">
+                    </div>
+                    <br>
+                    <form action="/game_details" method="post">
+                        <input type="hidden" name="game_list_element_index" value={{loop.index-1}}>
+                        <button type="submit" >{{game.title}}</button>
+                    </form>
+                </div>
+                {% endfor%}
+            </div>
+        {%endif%}
+
+    </div>
+</div>
+{% endblock %}

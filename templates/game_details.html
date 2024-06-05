@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="col-xl-3 col-md-5 col-sm-7">
+    <div id="container">
+        <a href ="/">Return</a>
+        <h1>{{game_data.title}}</h1>
+
+        <div id = "game_details_container">
+            {{game_data.description}}
+        </div>
+        <br>
+        <br>
+
+        <form action="/game" method="post">
+            <input type="hidden" name="game_list_element_index" value="{{ game_data }}">
+            <button type="submit" >Play</button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

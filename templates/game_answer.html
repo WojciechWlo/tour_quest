@@ -1,0 +1,19 @@
+{% extends "game.html" %}
+
+{% block game_container %}
+    <h3>{{stage.header}}</h3>
+    <br>
+    {%if stage.image %}
+        <image src = {{stage.image}} width = "100%" height = "300px">
+    {%endif%}
+    <br>
+    <div id = "game_details_container">
+        {{stage.description}}
+    </div>
+
+    <br>
+    <br>
+    {% include "game_form_answer.html" %}
+
+
+{% endblock %}

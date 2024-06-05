@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="col-xl-3 col-md-5 col-sm-7">
+    <div id="container">
+        <a href ="/game_details">Return</a>
+        {% block game_container %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}

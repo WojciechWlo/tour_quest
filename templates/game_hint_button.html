@@ -1,0 +1,75 @@
+<input type="button" onclick="checkHint()" class="button" value ="Check hint"/>
+
+<script>
+    function checkHint()
+    {
+        // Using AJAX (XMLHttpRequest)
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/check_hint', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Handle the server response here
+                displayHints(JSON.parse(xhr.responseText));
+            }
+        };
+
+        xhr.send();
+    }
+
+    function displayHints(hints)
+    {
+
+        var container = document.createElement("div");
+        container.className = "hint_container";
+        
+        var details_container = document.createElement("div");
+        details_container.className = "hint_details_container";
+
+
+        for(let i =0;i<hints.length;i++){
+            image = new Image();
+            image.src = hints[i]["image"]; 
+            image.className = "hint_image";
+            details_container.appendChild(image);
+            var br = document.createElement("br");
+            details_container.appendChild(br);
+
+            details_container.innerHTML +=hints[i]["text"];
+            if(i != hints.length-1)
+            {
+                for(let j = 0;j<2;j++)
+                {
+                    var br = document.createElement("br");
+                    details_container.appendChild(br);
+                
+                }
+            }
+
+
+        }
+
+
+        var black_cover = document.createElement("div");
+        black_cover.className = "black_cover"
+
+        black_cover.onclick = function() {
+            if(black_cover)
+            {
+                black_cover.remove();
+                black_cover = null;
+            }
+        };
+
+        container.append(details_container);
+
+        black_cover.appendChild(container);
+        
+        document.body.appendChild(black_cover);
+    };
+
+
+
+
+</script>
