@@ -8,7 +8,7 @@ Simple web touristic game offering creating stories and placing historical facts
 
 
 ### Note
-Files like secrets or .env ABSOLUTELY SHOULD NOT be commited, but since this project was created only for the simple purpose of getting to know Flask or Docker, I took the liberty of instructing you on how to prepare sample files:
+Files like secrets or .env ABSOLUTELY SHOULD NOT be commited, but since this project was created only for the simple purpose of getting to know Flask or Docker, I took the liberty of instructing you on how to prepare example files:
 * Go to ../TourQuest/
 * Create folder secrets
 * Go to ../TourQuest/secrets/
