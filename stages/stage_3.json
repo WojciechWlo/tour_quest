@@ -1,0 +1,7 @@
+{
+    "template" : "game_map",
+    "header" : "Road",
+    "label" : "Where to go",
+    "description" : "Praesent mauris nisl, luctus nec semper eget, pretium sit amet ex. Morbi mollis congue varius. Nunc id nibh bibendum magna tincidunt malesuada. Suspendisse vel dolor eleifend, pharetra sem at, venenatis orci. Maecenas convallis nec tellus eu ullamcorper. Sed nec dolor metus. Aliquam faucibus lectus ac metus euismod, euismod ultricies leo fermentum. Vestibulum dignissim nisi in sagittis vehicula. Sed tempor dui eros, vel dapibus purus vehicula quis. Sed varius nisl magna, eget tristique enim bibendum at. Morbi iaculis orci vel sagittis volutpat. Nunc in pulvinar nisl. Mauris tempor enim libero, eget lobortis dui tincidunt et. Cras vel nisi bibendum, aliquam diam quis, mollis quam. Donec mollis mauris in rutrum gravida.",
+    "destination" : "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d296.70717516412276!2d18.74922!3d53.492451!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4702cfed778e5619%3A0x66fbf04ca092a289!2s%C5%81aweczka%20Miko%C5%82aja%20Kopernika!5e0!3m2!1spl!2spl!4v1717509846757!5m2!1spl!2spl"
+}

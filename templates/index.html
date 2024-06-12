@@ -10,14 +10,15 @@
         {% if games is not none%}
             
             <div id = "games_list">
-                {%for game in games.games %}
+                {%for game in games %}
                 <div class ="games_list_element">
                     <div class="game_image">
                     </div>
                     <br>
                     <form action="/game_details" method="post">
-                        <input type="hidden" name="game_list_element_index" value={{loop.index-1}}>
-                        <button type="submit" >{{game.title}}</button>
+                        <!--<input type="hidden" name="game_list_element_index" value={{loop.index-1}}>-->
+                        <input type="hidden" name="game_name" value="{{game.name}}">
+                        <button type="submit" >{{game.name}}</button>
                     </form>
                 </div>
                 {% endfor%}

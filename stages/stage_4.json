@@ -1,0 +1,17 @@
+{
+    "template" : "game_answer",
+    "header" : "Question 1",
+    "description" : "Answer is one word and number. The word is the last word in the book's title. The number is quantity of visible coins from the moneybag.",
+    "answer" : "Monetae 7",
+    "image" : "static\\images\\answer1_image.jpg",
+    "hint_images" : [
+        {
+            "text":"The last of these three words.",
+            "image":"static\\images\\hint1_1_image.jpg"
+        }, 
+        {
+            "text":"Just count visible coins.",
+            "image":"static\\images\\hint1_2_image.jpg"
+        }
+        ]
+}

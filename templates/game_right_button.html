@@ -1,5 +1,5 @@
 {% block right_button %}
-    {% if stage_index < last_stage_index-1 %}
+    {% if stage_index[2] != None %}
     <a href="/next" class="button button_like button_like_right">Next</a>
     {% endif %}
 {%endblock%}

@@ -1,0 +1,5 @@
+{
+    "template" : "game_standard",
+    "header" : "Congratulations!",
+    "description" : "You have finished this game!"
+}

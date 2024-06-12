@@ -1,9 +1,11 @@
 import os
 import json
+import requests
 from flask import Flask,render_template,redirect, session,jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt 
-
+from sqlalchemy import and_, or_
+from sqlalchemy.orm import aliased
 from flask_session import Session
 
 from helpers import login_required
@@ -14,25 +16,7 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 bcrypt = Bcrypt(app) 
-
-games = {
-    "games" : [
-        {
-            "title" : "game 1",
-            "description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean eget ante at felis tempus viverra. Mauris accumsan est diam, vitae eleifend urna auctor eu. Praesent in lacus erat. Vivamus ac ante sit amet nulla laoreet elementum ac vel ex. Aliquam fringilla dolor vitae massa maximus, in congue lectus consectetur. Nulla facilisi. Cras dui ipsum, dapibus sed mollis a, vestibulum in nisl. Ut feugiat mollis leo, id laoreet risus aliquam et. Integer ut fringilla urna, sit amet aliquam augue. Curabitur et odio at elit facilisis aliquam vel in lorem. Nulla facilisi. Pellentesque rutrum sapien rhoncus nunc auctor ullamcorper. Mauris non efficitur eros. Vestibulum non laoreet nunc. Suspendisse molestie sapien in nulla porttitor, non gravida eros ultricies. Sed eleifend sodales odio."
-        },
-        {
-            "title" : "game 2",
-            "description" : "Donec iaculis porta risus quis cursus. Nulla non odio commodo, tempus neque ac, facilisis mi. Suspendisse in lacus justo. Sed ante nulla, bibendum a suscipit in, feugiat a enim. Sed ut maximus nibh. Sed neque nunc, cursus sed enim a, sollicitudin dapibus purus. Integer gravida mauris sem, ut pharetra neque tincidunt in. In sed dui non nibh porta venenatis."
-        },
-        {
-            "title" : "game 3",
-            "description" : "Donec iaculis porta risus quis cursus. Nulla non odio commodo, tempus neque ac, facilisis mi. Suspendisse in lacus justo. Sed ante nulla, bibendum a suscipit in, feugiat a enim. Sed ut maximus nibh. Sed neque nunc, cursus sed enim a, sollicitudin dapibus purus. Integer gravida mauris sem, ut pharetra neque tincidunt in. In sed dui non nibh porta venenatis. Donec iaculis porta risus quis cursus. Nulla non odio commodo, tempus neque ac, facilisis mi. Suspendisse in lacus justo. Sed ante nulla, bibendum a suscipit in, feugiat a enim. Sed ut maximus nibh. Sed neque nunc, cursus sed enim a, sollicitudin dapibus purus. Integer gravida mauris sem, ut pharetra neque tincidunt in. In sed dui non nibh porta venenatis. Donec iaculis porta risus quis cursus. Nulla non odio commodo, tempus neque ac, facilisis mi. Suspendisse in lacus justo. Sed ante nulla, bibendum a suscipit in, feugiat a enim. Sed ut maximus nibh. Sed neque nunc, cursus sed enim a, sollicitudin dapibus purus. Integer gravida mauris sem, ut pharetra neque tincidunt in. In sed dui non nibh porta venenatis."
-        }
-    ]
-
-}
-
+'''
 games_scenarios = {
     "scenarios" : [
         {
@@ -81,10 +65,76 @@ games_scenarios = {
             ]
         },
         {
-
+            "scenario" : [
+                {
+                    "template" : "game_standard",
+                    "header" : "stage 0",
+                    "label" : "label 0",
+                    "description" : "Donec accumsan neque ac urna viverra, eget auctor quam sodales. Praesent cursus ligula ante, a imperdiet erat ultrices ac. Nulla sollicitudin arcu non magna dapibus, et congue velit aliquet. Sed gravida eros at turpis molestie auctor. Duis accumsan dui sed justo molestie, non lacinia justo sollicitudin. Sed in aliquam velit. Etiam efficitur congue commodo. In faucibus, lacus et tempus mattis, ipsum magna rhoncus magna, egestas egestas eros ligula id urna. "
+                },
+                {
+                    "template" : "game_standard",
+                    "header" : "stage 1",
+                    "label" : "label 1",
+                    "description" : "Praesent mauris nisl, luctus nec semper eget, pretium sit amet ex. Morbi mollis congue varius. Nunc id nibh bibendum magna tincidunt malesuada. Suspendisse vel dolor eleifend, pharetra sem at, venenatis orci. Maecenas convallis nec tellus eu ullamcorper. Sed nec dolor metus. Aliquam faucibus lectus ac metus euismod, euismod ultricies leo fermentum. Vestibulum dignissim nisi in sagittis vehicula. Sed tempor dui eros, vel dapibus purus vehicula quis. Sed varius nisl magna, eget tristique enim bibendum at. Morbi iaculis orci vel sagittis volutpat. Nunc in pulvinar nisl. Mauris tempor enim libero, eget lobortis dui tincidunt et. Cras vel nisi bibendum, aliquam diam quis, mollis quam. Donec mollis mauris in rutrum gravida."
+               
+                },                {
+                    "template" : "game_map",
+                    "header" : "Road",
+                    "label" : "Where to go",
+                    "description" : "Praesent mauris nisl, luctus nec semper eget, pretium sit amet ex. Morbi mollis congue varius. Nunc id nibh bibendum magna tincidunt malesuada. Suspendisse vel dolor eleifend, pharetra sem at, venenatis orci. Maecenas convallis nec tellus eu ullamcorper. Sed nec dolor metus. Aliquam faucibus lectus ac metus euismod, euismod ultricies leo fermentum. Vestibulum dignissim nisi in sagittis vehicula. Sed tempor dui eros, vel dapibus purus vehicula quis. Sed varius nisl magna, eget tristique enim bibendum at. Morbi iaculis orci vel sagittis volutpat. Nunc in pulvinar nisl. Mauris tempor enim libero, eget lobortis dui tincidunt et. Cras vel nisi bibendum, aliquam diam quis, mollis quam. Donec mollis mauris in rutrum gravida.",
+                    "destination" : "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d296.70717516412276!2d18.74922!3d53.492451!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4702cfed778e5619%3A0x66fbf04ca092a289!2s%C5%81aweczka%20Miko%C5%82aja%20Kopernika!5e0!3m2!1spl!2spl!4v1717509846757!5m2!1spl!2spl"
+                },
+                {
+                    "template" : "game_answer",
+                    "header" : "Question 1",
+                    "description" : "Answer is one word and number. The word is the last word in the book's title. The number is quantity of visible coins from the moneybag.",
+                    "answer" : "Monetae 7",
+                    "image" : "static\\images\\answer1_image.jpg",
+                    "hint_images" : [
+                        {
+                            "text":"The last of these three words.",
+                            "image":"static\\images\\hint1_1_image.jpg"
+                        }, 
+                        {
+                            "text":"Just count visible coins.",
+                            "image":"static\\images\\hint1_2_image.jpg"
+                        }
+                        ]
+                },
+                {
+                    "template" : "game_standard",
+                    "header" : "Congratulations!",
+                    "description" : "You have finished this game!"
+                }
+            ]
         }
     ]
 }
+'''
+
+def read_json(source):
+    """
+    Reads JSON data from a local file or a URL.
+    
+    Args:
+        source (str): The path to the local JSON file or the URL of the JSON data.
+        
+    Returns:
+        dict: The JSON data parsed into a Python dictionary.
+    """
+    if os.path.isfile(source):
+        # Source is a local file path
+        with open(source, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+    else:
+        # Source is a URL
+        response = requests.get(source)
+        response.raise_for_status()  # Raise an HTTPError for bad responses
+        data = response.json()
+    
+    return data
+
 
 def get_connection_string():
 
@@ -105,9 +155,98 @@ db = SQLAlchemy(app)
 
 class User(db.Model):
     __tablename__ = 'users'
+    user_id = db.Column(db.Integer, primary_key=True)
+    login = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, unique=False, nullable=False)
+
+class Game(db.Model):
+    __tablename__ = 'games'
+    game_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True, nullable=False)
+    pathtofile = db.Column(db.String, unique=False, nullable=False)
+
+class Stage(db.Model):
+    __tablename__ = 'stages'
+    stage_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True, nullable=False)
+    pathtofile = db.Column(db.String, unique=False, nullable=False)
+
+class GameHasStage(db.Model):
+    __tablename__ = 'gamehasstage'
     id = db.Column(db.Integer, primary_key=True)
-    user_login = db.Column(db.String, unique=True, nullable=False)
-    user_password = db.Column(db.String, unique=False, nullable=False)
+    game_id = db.Column(db.Integer, unique=True, nullable=False)
+    stage_id = db.Column(db.Integer, unique=False, nullable=False)
+
+class NextStage(db.Model):
+    __tablename__ = 'nextstage'
+    id = db.Column(db.Integer, primary_key=True)
+    stage_id = db.Column(db.Integer, unique=False, nullable=True)
+    nextstage_id = db.Column(db.Integer, unique=False, nullable=True)
+
+
+def getNullToFirstStageOfGame(game_index):
+    # Aliases for tables
+    ghs = aliased(GameHasStage)
+
+    # Perform the query
+    nullToFirstStage = db.session.query(
+        NextStage.id,
+        NextStage.stage_id,
+        NextStage.nextstage_id
+    ).join(
+        ghs, NextStage.nextstage_id == ghs.stage_id
+    ).filter(
+        NextStage.stage_id == None,
+        ghs.game_id == game_index
+    ).all()
+    
+    if len(nullToFirstStage)>0:
+        nullToFirstStage = nullToFirstStage[0]
+    else:
+        nullToFirstStage = None
+
+    return nullToFirstStage
+
+def getFirstStageOfGame(game_index):
+    NullToFirstStage = getNullToFirstStageOfGame(game_index)
+    if NullToFirstStage!=None:
+        FirstStage = NullToFirstStage.nextstage_id
+    else:
+        FirstStage = None
+    return FirstStage
+
+
+def get_previous_current_next_stages(current_stage_id):
+    prev = aliased(NextStage)
+    next = aliased(NextStage)
+
+    prev_curr_next_stages = db.session.query(
+        prev.stage_id.label('previous_stage_id'),
+        NextStage.stage_id.label('current_stage_id'),
+        next.stage_id.label('next_stage_id')
+    ).select_from(
+        NextStage
+    ).outerjoin(
+        prev, prev.nextstage_id == NextStage.stage_id
+    ).outerjoin(
+        next, NextStage.nextstage_id == next.stage_id
+    ).filter(
+        NextStage.stage_id == current_stage_id
+    ).first()
+
+    return [prev_curr_next_stages.previous_stage_id, prev_curr_next_stages.current_stage_id,prev_curr_next_stages.next_stage_id]
+
+
+
+def setFirstStageOfGame(game_index):
+    FirstStage = getFirstStageOfGame(game_index)
+
+    session["stage"] = [None, None, None]
+
+    session["stage"] = get_previous_current_next_stages(FirstStage)
+
+
+
 
 
 @app.after_request
@@ -131,36 +270,46 @@ def check_hint():
 def index():
     session["direction"] = None
     session["game_index"] = None
+
+
+    result = Game.query.all()
+
+    # Convert the result to a list of dictionaries
+    games = [{'name': game.name} for game in result]
+
+    
+
     return render_template("index.html", login = session["login"], games = games)
 
 @app.route('/game_details', methods=["POST", "GET"])
 @login_required
 def game_details():
-    '''
-    game_data = request.form.get("game_list_element_details").replace( "'","\"")
-    json_game_data = json.loads(game_data)
-    return render_template("game_details.html", game_data = json_game_data)
-    '''
-
-    #print("afasdafaf: ",session["game_index"])
-    if "stage" in session.keys():
-        session["stage"] = 0
 
     if request.method =="POST":
         if session["game_index"]:
-            return render_template("game_details.html", game_data = games["games"][session["game_index"]])
+            game = Game.query.filter_by(game_id=f'{session["game_index"]}').all()[0]
         else:
-            game_index = int(request.form.get("game_list_element_index"))
+            game = Game.query.filter_by(name=f'{request.form.get("game_name")}').all()[0]
+            game_index = game.game_id
             session["game_index"] = game_index
-            game_data =games["games"][game_index]
-            return render_template("game_details.html", game_data = game_data)
+
+        game_data = read_json(game.pathtofile)
+
+        setFirstStageOfGame(game.game_id)
+            
+        return render_template("game_details.html", game_data = game_data)
 
 
     if session["game_index"]!=None:
-        return render_template("game_details.html", game_data = games["games"][session["game_index"]])
+        game = Game.query.filter_by(game_id=f'{session["game_index"]}').all()[0]
+        game_data = read_json(game.pathtofile)
+
+        if "stage" in session.keys():
+            setFirstStageOfGame(game.game_id)
+
+        return render_template("game_details.html", game_data = game_data)
     
     return redirect('/')
-
 
 
 @app.route('/answer',methods=["POST"])
@@ -189,31 +338,62 @@ def next():
 @login_required
 def game():
 
-    scenario = games_scenarios["scenarios"][session["game_index"]]["scenario"]
+    '''
+    result = GameHasStage.query.filter_by(game_id=f'{session["game_index"]}').all()
+    print(result)
+    '''
 
+    '''
+    next_stage_null = NextStage.query \
+        .outerjoin(GameHasStage, NextStage.Stage_ID == GameHasStage.Stage_ID) \
+        .filter(GameHasStage.Game_ID == f'{session["game_index"]}') \
+        .filter(NextStage.Stage_ID.is_(None)) \
+        .all()
+
+    next_stage_null_ids = [{"id" : ns.id, "stage_id":ns.stage_id ,"next_stage_id": ns.nextstage.id} for ns in next_stage_null]
+
+    print(next_stage_null_ids)
+    '''
+
+    #scenario = games_scenarios["scenarios"][session["game_index"]]["scenario"]
+
+
+
+    
     if not session["direction"] in [-1,1]:
         session["direction"] = 0
 
 
     if not "stage" in session.keys():# or session["stage"] == None:
-        session["stage"] = 0
+        setFirstStageOfGame(game.game_id)
     else:
+        if session["direction"] == 1 and session["stage"][2] != None:
+            session["stage"] = get_previous_current_next_stages(session["stage"][2])
+        elif session["direction"] == -1 and session["stage"][0] != None:
+            session["stage"] = get_previous_current_next_stages(session["stage"][0])
+        '''
         session["stage"] +=session["direction"]
         if session["stage"] <0:
             session["stage"] =0
         elif session["stage"]>len(scenario)-1:
             session["stage"] = len(scenario)-1
+        '''
         session["direction"] = 0 
 
+
+    result = Stage.query.filter_by(stage_id=f'{session["stage"][1]}').all()[0]
+    stage = read_json(result.pathtofile)
+
+
     #scenario = games_scenarios[session["game_index"]] ["scenario"][session["stage"]]
-    stage = scenario[session["stage"]]
+    #stage = scenario[session["stage"][1]]
 
     stage_template = stage["template"]
 
     if stage_template == "game_answer":
         session["answer"] = stage["answer"]
 
-    return render_template(f'{stage_template}.html', stage = stage, stage_index = session["stage"], last_stage_index = len(scenario))
+    return render_template(f'{stage_template}.html', stage = stage, stage_index = session["stage"])
     #return render_template(f'game_standard.html', scenario = scenario)
 
 @app.route('/logout')
@@ -232,7 +412,7 @@ def login():
         if not request.form.get("login"):
             return render_template("login.html", msg= "You have to provide login!")
 
-        result = User.query.filter_by(user_login=f'{request.form.get("login")}').all()
+        result = User.query.filter_by(login=f'{request.form.get("login")}').all()
         if len(result) == 0:
             return render_template("login.html", msg= "User with this login does not exist!")
         
@@ -240,7 +420,7 @@ def login():
             return render_template("login.html", msg= "You have to provide password!")
         
 
-        if  not bcrypt.check_password_hash(result[0].user_password, request.form.get("password")) :
+        if  not bcrypt.check_password_hash(result[0].password, request.form.get("password")) :
             return render_template("login.html", msg = "Wrong login or password")
 
 
@@ -257,7 +437,7 @@ def register():
         if not request.form.get("login"):
             return render_template("register.html", msg = "You have to provide login!")
 
-        result = User.query.filter_by(user_login=f'{request.form.get("login")}').all()
+        result = User.query.filter_by(login=f'{request.form.get("login")}').all()
         if len(result) >0:
             return render_template("register.html", msg= "User with such login exists!")
         
@@ -272,7 +452,7 @@ def register():
 
         hashed_password = bcrypt.generate_password_hash(request.form.get("password")).decode('utf-8') 
 
-        new_user = User(user_login=request.form.get("login"), user_password=hashed_password)
+        new_user = User(login=request.form.get("login"), password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
