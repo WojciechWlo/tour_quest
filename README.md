@@ -14,11 +14,84 @@ Files like secrets or .env ABSOLUTELY SHOULD NOT be commited, but since this pro
 * Go to ../TourQuest/secrets/
 * Create file initdb.sql. Inside should be placed database structure:
 ```
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    user_login TEXT NOT NULL,
-    user_password TEXT NOT NULL
+-- Users table
+CREATE TABLE Users (
+    User_ID SERIAL PRIMARY KEY,
+    Login TEXT NOT NULL,
+    Password TEXT NOT NULL
 );
+
+-- Games table
+CREATE TABLE Games (
+    Game_ID SERIAL PRIMARY KEY,
+    Name TEXT NOT NULL,
+	PathToFile Text NOT NULL
+);
+
+-- Stage table
+CREATE TABLE Stages (
+    Stage_ID SERIAL PRIMARY KEY,
+	Name TEXT NOT NULL,
+    PathToFile TEXT NOT NULL
+);
+
+-- GameHasStage table
+CREATE TABLE GameHasStage (
+    ID SERIAL PRIMARY KEY,
+    Game_ID INT,
+    Stage_ID INT,
+    FOREIGN KEY (Game_ID) REFERENCES Games(Game_ID),
+    FOREIGN KEY (Stage_ID) REFERENCES Stages(Stage_ID)
+);
+
+-- NextStage table
+CREATE TABLE NextStage (
+    ID SERIAL PRIMARY KEY,
+    Stage_ID INT,
+    NextStage_ID INT,
+    FOREIGN KEY (Stage_ID) REFERENCES Stages(Stage_ID),
+    FOREIGN KEY (NextStage_ID) REFERENCES Stages(Stage_ID)
+);
+
+-- UserClearedStage table
+CREATE TABLE UserClearedStage (
+    ID SERIAL PRIMARY KEY,
+    User_ID INT,
+    Stage_ID INT,
+    FOREIGN KEY (User_ID) REFERENCES Users(User_ID),
+    FOREIGN KEY (Stage_ID) REFERENCES Stages(Stage_ID)
+);
+
+-- Inserting data into the Games table
+INSERT INTO Games (Name, PathToFile) VALUES
+('Game 1', 'games/game 1/game_1.json'),
+('Game 2', 'games/game 2/game_2.json'),
+('Game 3', 'games/game 3/game_3.json');
+
+-- Inserting data into the Stages table
+INSERT INTO Stages (Name, PathToFile) VALUES
+('Stage 1', 'stages/stage_1.json'),
+('Stage 2', 'stages/stage_2.json'),
+('Stage 3', 'stages/stage_3.json'),
+('Stage 4', 'stages/stage_4.json'),
+('Stage 5', 'stages/stage_5.json');
+
+-- Inserting data into the NextStage table
+INSERT INTO NextStage (Stage_ID, NextStage_ID) VALUES
+(3,4),
+(2,1),
+(1,3),
+(null,2),
+(4,5),
+(5,null);
+
+-- Inserting data into the GameHasStage table
+INSERT INTO GameHasStage (Game_ID, Stage_ID) VALUES
+(1,1),
+(1,2),
+(1,3),
+(1,4),
+(1,5);
 ```
 * Create file pg_db. Inside should be placed chosen database name, for example:
 ```
