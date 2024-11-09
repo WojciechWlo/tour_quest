@@ -165,7 +165,10 @@ def after_request(response):
 @app.route('/check_hint',methods=["POST"])
 @login_required
 def check_hint():
-    hints = games_scenarios["scenarios"][session["game_index"]]["scenario"][session["stage"]]["hint_images"]
+    result = Stage.query.filter_by(stage_id=f'{session["stage"][1]}').all()[0]
+    stage = read_json(result.pathtofile)
+
+    hints = stage["hint_images"]
 
     return jsonify(hints)
 
