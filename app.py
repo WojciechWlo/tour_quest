@@ -245,7 +245,7 @@ def next():
 @app.route('/game', methods=["POST", "GET"])
 @login_required
 def game():
-
+    
     '''
     result = GameHasStage.query.filter_by(game_id=f'{session["game_index"]}').all()
     print(result)
@@ -267,14 +267,13 @@ def game():
 
 
 
-    
     if not session["direction"] in [-1,1]:
         session["direction"] = 0
-
 
     if not "stage" in session.keys():# or session["stage"] == None:
         setFirstStageOfGame(game.game_id)
     else:
+
         if session["direction"] == 1 and session["stage"][2] != None:
             session["stage"] = get_previous_current_next_stages(session["stage"][2])
         elif session["direction"] == -1 and session["stage"][0] != None:
@@ -288,7 +287,7 @@ def game():
         '''
         session["direction"] = 0 
 
-
+    #Error when no record in table 
     result = Stage.query.filter_by(stage_id=f'{session["stage"][1]}').all()[0]
     stage = read_json(result.pathtofile)
 
