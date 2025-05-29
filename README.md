@@ -25,7 +25,8 @@ CREATE TABLE Users (
 CREATE TABLE Games (
     Game_ID SERIAL PRIMARY KEY,
     Name TEXT NOT NULL,
-	PathToFile Text NOT NULL
+	PathToFile Text NOT NULL,
+    Released BOOLEAN NOT NULL
 );
 
 -- Stage table
@@ -62,11 +63,21 @@ CREATE TABLE UserClearedStage (
     FOREIGN KEY (Stage_ID) REFERENCES Stages(Stage_ID)
 );
 
+
+CREATE TABLE UserClearedGame (
+    ID SERIAL PRIMARY KEY,
+    User_ID INT,
+    Game_ID INT,
+    FOREIGN KEY (User_ID) REFERENCES Users(User_ID),
+    FOREIGN KEY (Game_ID) REFERENCES Games(Game_ID)
+);
+
+
 -- Inserting data into the Games table
-INSERT INTO Games (Name, PathToFile) VALUES
-('Game 1', 'games/game 1/game_1.json'),
-('Game 2', 'games/game 2/game_2.json'),
-('Game 3', 'games/game 3/game_3.json');
+INSERT INTO Games (Name, PathToFile, Released) VALUES
+('Game 1', 'games/game 1/game_1.json', True),
+('Game 2', 'games/game 2/game_2.json', False),
+('Game 3', 'games/game 3/game_3.json', False);
 
 -- Inserting data into the Stages table
 INSERT INTO Stages (Name, PathToFile) VALUES
@@ -79,9 +90,9 @@ INSERT INTO Stages (Name, PathToFile) VALUES
 -- Inserting data into the NextStage table
 INSERT INTO NextStage (Stage_ID, NextStage_ID) VALUES
 (3,4),
-(2,1),
-(1,3),
-(null,2),
+(1,2),
+(2,3),
+(null,1),
 (4,5),
 (5,null);
 
