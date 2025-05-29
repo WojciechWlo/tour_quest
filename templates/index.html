@@ -13,7 +13,9 @@
                 {%for game in games %}
                 <div class ="games_list_element">
                     <div class="game_image" style="background-image:url('{{ game.image }}')">
-
+                        {% if game.cleared%}
+                            <img src = "static/images/cleared_game.webp" style="width: 300px; height: auto;">
+                        {% endif %}
                     </div>
                     <br>
                     <form action="/game_details" method="post">

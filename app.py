@@ -190,10 +190,19 @@ def index():
     result = Game.query.all()
 
     # Convert the result to a list of dictionaries
-    games = [{'name': game.name, 'pathtofile':game.pathtofile} for game in result]
+    games = [{'name': game.name, 'pathtofile':game.pathtofile, 'game_id': game.game_id} for game in result]
 
     for game in games:
         game["image"] = read_json(game["pathtofile"])["image"]
+        game.pop("pathtofile")
+        
+        user_id = User.query.filter_by(login = session["login"]).all()[0].user_id
+
+        userClearedGame = UserClearedGame.query.filter_by(user_id = user_id, game_id=game["game_id"]).all()
+        game.pop("game_id")
+        
+        if len(userClearedGame) > 0:
+            game["cleared"] = True
 
     return render_template("index.html", login = session["login"], games = games)
 
@@ -273,7 +282,7 @@ def game():
 
         session["direction"] = 0 
 
-    #Error when no record in table 
+    # Error when no record in table 
     result = Stage.query.filter_by(stage_id=f'{session["stage"][1]}').all()[0]
     stage = read_json(result.pathtofile)
 
@@ -281,6 +290,19 @@ def game():
 
     if stage_template == "game_answer":
         session["answer"] = stage["answer"]
+
+    # Checking if the last stage of game 
+    if session["stage"][2] == None:
+
+        userClearedGame = UserClearedGame.query.filter_by(user_id=User.query.filter_by(login = session["login"]).all()[0].user_id, 
+                                             game_id=session["game_index"]).all()
+
+        if len(userClearedGame) == 0:
+            
+            newUserClearedGame = UserClearedGame(user_id=User.query.filter_by(login = session["login"]).all()[0].user_id, 
+                                                game_id=session["game_index"])
+            db.session.add(newUserClearedGame)
+            db.session.commit()        
 
     return render_template(f'{stage_template}.html', stage = stage, stage_index = session["stage"])
 

@@ -166,7 +166,8 @@ a:hover{
     background-color: var(--motive_color_1);
     color: var(--motive_font_color);
     border-radius: 10px;
-    width: 30%;
+    width: 75%;
+    max-width: 600px;
     padding: 2%;
     position: fixed;
     bottom: 0%;
@@ -174,6 +175,13 @@ a:hover{
     transform: translate(-50%, 0);
     text-align: center;
 
+}
+
+@media(width <767px){
+    .hint_container{
+        width: 85%;
+        max-width: 85%;
+    }
 }
 
 .hint_details_container{
