@@ -105,6 +105,8 @@ form {
     background-color: white;
     min-width: 100%;
     min-height: 256px;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 .game_button, .game_button_right{

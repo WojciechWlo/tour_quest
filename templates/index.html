@@ -12,7 +12,8 @@
             <div id = "games_list">
                 {%for game in games %}
                 <div class ="games_list_element">
-                    <div class="game_image">
+                    <div class="game_image" style="background-image:url('{{ game.image }}')">
+
                     </div>
                     <br>
                     <form action="/game_details" method="post">

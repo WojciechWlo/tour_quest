@@ -69,6 +69,7 @@ class Game(db.Model):
     game_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
     pathtofile = db.Column(db.String, unique=False, nullable=False)
+    released = db.Column(db.Boolean, unique=False, nullable=False)
 
 class Stage(db.Model):
     __tablename__ = 'stages'
@@ -87,6 +88,16 @@ class NextStage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     stage_id = db.Column(db.Integer, unique=False, nullable=True)
     nextstage_id = db.Column(db.Integer, unique=False, nullable=True)
+
+class UserClearedGame(db.Model):
+    __tablename__ = 'userclearedgame'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    game_id = db.Column(db.Integer, db.ForeignKey('games.game_id'), nullable=False)
+
+    user = db.relationship('User', backref='cleared_games')
+    game = db.relationship('Game', backref='cleared_by_users')
 
 
 def getNullToFirstStageOfGame(game_index):
@@ -111,6 +122,7 @@ def getNullToFirstStageOfGame(game_index):
         nullToFirstStage = None
 
     return nullToFirstStage
+
 
 def getFirstStageOfGame(game_index):
     NullToFirstStage = getNullToFirstStageOfGame(game_index)
@@ -142,16 +154,12 @@ def get_previous_current_next_stages(current_stage_id):
     return [prev_curr_next_stages.previous_stage_id, prev_curr_next_stages.current_stage_id,prev_curr_next_stages.next_stage_id]
 
 
-
 def setFirstStageOfGame(game_index):
     FirstStage = getFirstStageOfGame(game_index)
 
     session["stage"] = [None, None, None]
 
     session["stage"] = get_previous_current_next_stages(FirstStage)
-
-
-
 
 
 @app.after_request
@@ -179,13 +187,13 @@ def index():
     session["direction"] = None
     session["game_index"] = None
 
-
     result = Game.query.all()
 
     # Convert the result to a list of dictionaries
-    games = [{'name': game.name} for game in result]
+    games = [{'name': game.name, 'pathtofile':game.pathtofile} for game in result]
 
-    
+    for game in games:
+        game["image"] = read_json(game["pathtofile"])["image"]
 
     return render_template("index.html", login = session["login"], games = games)
 
@@ -205,7 +213,7 @@ def game_details():
 
         setFirstStageOfGame(game.game_id)
             
-        return render_template("game_details.html", game_data = game_data)
+        return render_template("game_details.html", game_data = game_data, released = game.released)
 
 
     if session["game_index"]!=None:
@@ -215,7 +223,7 @@ def game_details():
         if "stage" in session.keys():
             setFirstStageOfGame(game.game_id)
 
-        return render_template("game_details.html", game_data = game_data)
+        return render_template("game_details.html", game_data = game_data, released = game.released)
     
     return redirect('/')
 
@@ -245,28 +253,12 @@ def next():
 @app.route('/game', methods=["POST", "GET"])
 @login_required
 def game():
+
+    game = Game.query.filter_by(game_id=f'{session["game_index"]}').all()[0]
     
-    '''
-    result = GameHasStage.query.filter_by(game_id=f'{session["game_index"]}').all()
-    print(result)
-    '''
-
-    '''
-    next_stage_null = NextStage.query \
-        .outerjoin(GameHasStage, NextStage.Stage_ID == GameHasStage.Stage_ID) \
-        .filter(GameHasStage.Game_ID == f'{session["game_index"]}') \
-        .filter(NextStage.Stage_ID.is_(None)) \
-        .all()
-
-    next_stage_null_ids = [{"id" : ns.id, "stage_id":ns.stage_id ,"next_stage_id": ns.nextstage.id} for ns in next_stage_null]
-
-    print(next_stage_null_ids)
-    '''
-
-    #scenario = games_scenarios["scenarios"][session["game_index"]]["scenario"]
-
-
-
+    if not game.released:
+        return redirect("game_details")
+        
     if not session["direction"] in [-1,1]:
         session["direction"] = 0
 
@@ -278,22 +270,12 @@ def game():
             session["stage"] = get_previous_current_next_stages(session["stage"][2])
         elif session["direction"] == -1 and session["stage"][0] != None:
             session["stage"] = get_previous_current_next_stages(session["stage"][0])
-        '''
-        session["stage"] +=session["direction"]
-        if session["stage"] <0:
-            session["stage"] =0
-        elif session["stage"]>len(scenario)-1:
-            session["stage"] = len(scenario)-1
-        '''
+
         session["direction"] = 0 
 
     #Error when no record in table 
     result = Stage.query.filter_by(stage_id=f'{session["stage"][1]}').all()[0]
     stage = read_json(result.pathtofile)
-
-
-    #scenario = games_scenarios[session["game_index"]] ["scenario"][session["stage"]]
-    #stage = scenario[session["stage"][1]]
 
     stage_template = stage["template"]
 
@@ -301,7 +283,6 @@ def game():
         session["answer"] = stage["answer"]
 
     return render_template(f'{stage_template}.html', stage = stage, stage_index = session["stage"])
-    #return render_template(f'game_standard.html', scenario = scenario)
 
 @app.route('/logout')
 @login_required

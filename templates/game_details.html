@@ -11,12 +11,16 @@
         </div>
         <br>
         <br>
-
+        {% if released %}
         <form action="/game" method="post">
             <!--<input type="hidden" name="game_name" value="{{ game_data.game_name }}">-->
             <button type="submit" >Play</button>
         </form>
-
+        {% else %}
+            <p class="form_message">
+                Game is not released yet.
+            </p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
