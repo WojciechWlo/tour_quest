@@ -63,7 +63,7 @@ CREATE TABLE UserClearedStage (
     FOREIGN KEY (Stage_ID) REFERENCES Stages(Stage_ID)
 );
 
-
+-- UserClearedGame table
 CREATE TABLE UserClearedGame (
     ID SERIAL PRIMARY KEY,
     User_ID INT,
@@ -85,7 +85,10 @@ INSERT INTO Stages (Name, PathToFile) VALUES
 ('Stage 2', 'stages/stage_2.json'),
 ('Stage 3', 'stages/stage_3.json'),
 ('Stage 4', 'stages/stage_4.json'),
-('Stage 5', 'stages/stage_5.json');
+('Stage 5', 'stages/stage_5.json'),
+('Stage 6', 'stages/stage_6.json'),
+('Stage 7', 'stages/stage_7.json'),
+('Stage 8', 'stages/stage_8.json');
 
 -- Inserting data into the NextStage table
 INSERT INTO NextStage (Stage_ID, NextStage_ID) VALUES
@@ -94,7 +97,10 @@ INSERT INTO NextStage (Stage_ID, NextStage_ID) VALUES
 (2,3),
 (null,1),
 (4,5),
-(5,null);
+(5,6),
+(6,7),
+(7,8),
+(8,null);
 
 -- Inserting data into the GameHasStage table
 INSERT INTO GameHasStage (Game_ID, Stage_ID) VALUES
@@ -102,7 +108,10 @@ INSERT INTO GameHasStage (Game_ID, Stage_ID) VALUES
 (1,2),
 (1,3),
 (1,4),
-(1,5);
+(1,5),
+(1,6),
+(1,7),
+(1,8);
 ```
 * Create file pg_db. Inside should be placed chosen database name, for example:
 ```
