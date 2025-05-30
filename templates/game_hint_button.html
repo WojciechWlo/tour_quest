@@ -29,12 +29,17 @@
 
 
         for(let i =0;i<hints.length;i++){
-            image = new Image();
-            image.src = hints[i]["image"]; 
-            image.className = "hint_image";
-            details_container.appendChild(image);
-            var br = document.createElement("br");
-            details_container.appendChild(br);
+
+            if(hints[i]["image"]){
+                image = new Image();
+                image.src = hints[i]["image"]; 
+                image.className = "hint_image";
+                details_container.appendChild(image);
+                var br = document.createElement("br");
+                details_container.appendChild(br);
+            }
+
+
 
             details_container.innerHTML +=hints[i]["text"];
             if(i != hints.length-1)

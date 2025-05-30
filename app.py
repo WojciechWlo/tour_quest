@@ -7,13 +7,24 @@ from flask_bcrypt import Bcrypt
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
 from flask_session import Session
-
+import shutil
 from helpers import login_required
 
 app = Flask(__name__)
 
 app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_FILE_DIR"] = "/tmp/flask_sessions"  # opcjonalnie
 app.config["SESSION_TYPE"] = "filesystem"
+
+# CZYSZCZENIE SESJI
+def clear_session_folder():
+    folder = app.config['SESSION_FILE_DIR']
+    if os.path.exists(folder):
+        shutil.rmtree(folder)
+    os.makedirs(folder)
+
+clear_session_folder()
+
 Session(app)
 bcrypt = Bcrypt(app) 
 
@@ -184,6 +195,8 @@ def check_hint():
 @app.route('/')
 @login_required
 def index():
+    user_id = User.query.filter_by(login = session["login"]).all()[0].user_id
+
     session["direction"] = None
     session["game_index"] = None
 
@@ -196,7 +209,7 @@ def index():
         game["image"] = read_json(game["pathtofile"])["image"]
         game.pop("pathtofile")
         
-        user_id = User.query.filter_by(login = session["login"]).all()[0].user_id
+        
 
         userClearedGame = UserClearedGame.query.filter_by(user_id = user_id, game_id=game["game_id"]).all()
         game.pop("game_id")
@@ -375,5 +388,4 @@ def register():
 
 
 if __name__ == '__main__':
-    #get_secrets()
     app.run(debug=True, host='0.0.0.0', port="5000")

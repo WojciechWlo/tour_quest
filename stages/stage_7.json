@@ -1,0 +1,12 @@
+{
+    "template" : "game_answer",
+    "header" : "Question 2",
+    "description" : "How many bricks is under Copernicus?",
+    "answer" : "7",
+    "image" : "static\\images\\IMG_20240412_111617952.jpg",
+    "hint_images" : [
+        {
+            "text":"Just count bricks."
+        }
+        ]
+}
